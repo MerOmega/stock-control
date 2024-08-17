@@ -18,8 +18,8 @@ class Supply extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function pcs(): BelongsToMany
+    public function devices(): BelongsToMany
     {
-        return $this->belongsToMany(PC::class, 'pc_supply');
+        return $this->belongsToMany(PC::class, 'device_supply');
     }
 }
