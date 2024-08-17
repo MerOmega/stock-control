@@ -1,6 +1,8 @@
 <?php
 
-use App\Models\Category;
+use App\Models\Device;
+use App\Models\PC;
+use App\Models\Supply;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +14,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('supplies', function (Blueprint $table) {
+        Schema::create('device_supply', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Category::class)->nullable()->constrained()->nullOnDelete();
-            $table->bigInteger('quantity');
-            $table->text('description');
-            $table->text('observations');
+            $table->foreignIdFor(Supply::class)->nullable()->constrained()->nullOnDelete();
+            $table->foreignIdFor(Device::class)->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supplies');
+        Schema::dropIfExists('device_supply');
     }
 };
