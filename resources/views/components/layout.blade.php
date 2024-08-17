@@ -3,10 +3,33 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laravel</title>
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <title>{{ $title }}</title>
+    @vite('resources/css/app.css')
+    @vite('resources/js/app.js')
 </head>
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
-    {{ $slot }}
-</body>
+<div class="min-h-full">
+    @php
+        $links = [
+            ['url' => '/', 'text' => 'Inicio', 'active' => request()->routeIs('dashboard')],
+            ['url' => '/category', 'text' => 'Categorias', 'active' => request()->routeIs('team')],
+            ['url' => '/supply', 'text' => 'Insumos', 'active' => request()->routeIs('projects')],
+            ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('calendar')],
+//            TODO Add the route for the reports in the future
+//            ['url' => '#', 'text' => 'Reportes', 'active' => request()->routeIs('reports')],
+        ];
+    @endphp
+
+    <x-navbar :links="$links" />
+
+    <header class="bg-white shadow">
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $title }}</h1>
+        </div>
+    </header>
+    <main >
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 ">
+            {{ $slot }}
+        </div>
+    </main>
+</div>
 </html>
