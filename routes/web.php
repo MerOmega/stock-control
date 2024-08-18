@@ -1,14 +1,13 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/category', function () {
-    return view('category');
-});
+Route::resource('categories', CategoryController::class);
 
 Route::get('/supply', function () {
     return view('supply');

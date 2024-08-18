@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('configurations', function (Blueprint $table) {
             $table->id();
             $table->integer('low_stock_alert');
+            $table->integer('default_per_page')->default(10);
             $table->timestamps();
         });
     }

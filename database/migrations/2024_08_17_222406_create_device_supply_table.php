@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Device;
-use App\Models\PC;
 use App\Models\Supply;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Supply::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Device::class)->nullable()->constrained()->nullOnDelete();
+            $table->integer('quantity');
             $table->timestamps();
         });
     }

@@ -11,11 +11,9 @@
     @php
         $links = [
             ['url' => '/', 'text' => 'Inicio', 'active' => request()->routeIs('dashboard')],
-            ['url' => '/category', 'text' => 'Categorias', 'active' => request()->routeIs('team')],
+            ['url' => '/categories', 'text' => 'Categorias', 'active' => request()->routeIs('categories.index')],
             ['url' => '/supply', 'text' => 'Insumos', 'active' => request()->routeIs('projects')],
             ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('calendar')],
-//            TODO Add the route for the reports in the future
-//            ['url' => '#', 'text' => 'Reportes', 'active' => request()->routeIs('reports')],
         ];
     @endphp
 
