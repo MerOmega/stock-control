@@ -15,7 +15,6 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // Apply the saved theme on page load
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
@@ -29,8 +28,8 @@
     @php
         $links = [
             ['url' => '/', 'text' => 'Inicio', 'active' => request()->routeIs('dashboard')],
-            ['url' => '/category', 'text' => 'Categorias', 'active' => request()->routeIs('category.index')],
-            ['url' => '/supply', 'text' => 'Insumos', 'active' => request()->routeIs('projects')],
+            ['url' => '/categories', 'text' => 'Categorias', 'active' => request()->routeIs('category.index')],
+            ['url' => '/supplies', 'text' => 'Insumos', 'active' => request()->routeIs('projects')],
             ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('calendar')],
         ];
     @endphp

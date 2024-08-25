@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Configuration;
 use App\Models\Supply;
 use Illuminate\Http\Request;
 
@@ -10,9 +12,25 @@ class SupplyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Supply::query();
+
+        if ($categoryId = $request->input('category_id')) {
+            $query->where('category_id', $categoryId);
+        }
+
+        if ($search = $request->input('search')) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        $categories = Category::all();
+        $supplies = $query->orderBy('name')->paginate(Configuration::first()->default_per_page);
+        return view('supply.index', [
+            'supplies' => $supplies,
+            'categories' => $categories,
+            'selectedCategory' => $categoryId,
+        ]);
     }
 
     /**
@@ -20,7 +38,8 @@ class SupplyController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        return view('supply.create', compact('categories'));
     }
 
     /**
@@ -28,15 +47,26 @@ class SupplyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'         => 'required|string|max:255',
+            'category_id'  => 'nullable|exists:categories,id',
+            'quantity'     => 'required|integer|min:1',
+            'description'  => 'nullable|string',
+            'observations' => 'nullable|string',
+        ]);
+
+        Supply::create($request->all());
+        return redirect()->route('supplies.index')->with('success', 'Supply created successfully!');
     }
+
 
     /**
      * Display the specified resource.
      */
     public function show(Supply $supply)
     {
-        //
+        // Show the specific supply
+        return view('supply.show', ['supply' => $supply]);
     }
 
     /**
@@ -44,7 +74,9 @@ class SupplyController extends Controller
      */
     public function edit(Supply $supply)
     {
-        //
+
+        $categories = Category::all();
+        return view('supply.edit', ['supply' => $supply, 'categories' => $categories]);
     }
 
     /**
@@ -52,7 +84,19 @@ class SupplyController extends Controller
      */
     public function update(Request $request, Supply $supply)
     {
-        //
+        // Validate the request data
+        $validated = $request->validate([
+            'name'         => 'required|string|max:255',
+            'category_id'  => 'nullable|exists:categories,id',
+            'quantity'     => 'required|integer|min:1',
+            'description'  => 'nullable|string',
+            'observations' => 'nullable|string',
+        ]);
+
+        $supply->update($validated);
+
+        return redirect()->route('supplies.show', $supply->id)
+            ->with('success', 'Supply updated successfully!');
     }
 
     /**
@@ -60,6 +104,8 @@ class SupplyController extends Controller
      */
     public function destroy(Supply $supply)
     {
-        //
+        $supply->delete();
+        return redirect()->route('supplies.index')
+            ->with('success', 'Supply deleted successfully!');
     }
 }

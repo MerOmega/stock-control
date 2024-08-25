@@ -14,10 +14,11 @@ return new class extends Migration
     {
         Schema::create('supplies', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->foreignIdFor(Category::class)->nullable()->constrained()->nullOnDelete();
-            $table->bigInteger('quantity');
-            $table->text('description');
-            $table->text('observations');
+            $table->bigInteger('quantity')->default(1);
+            $table->text('description')->nullable();
+            $table->text('observations')->nullable();
             $table->timestamps();
         });
     }

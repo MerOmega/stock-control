@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SupplyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,6 +9,7 @@ Route::get('/', function () {
 });
 
 Route::resource('categories', CategoryController::class);
+Route::resource('supplies', SupplyController::class);
 
 Route::get('/supply', function () {
     return view('supply');

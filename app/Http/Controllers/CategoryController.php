@@ -52,7 +52,6 @@ class CategoryController extends Controller
         $category      = Category::create([
             'name' => $validatedData['name'],
         ]);
-        $category->save();
         return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
 
