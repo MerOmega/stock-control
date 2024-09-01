@@ -34,7 +34,6 @@ return new class extends Migration
 
         Schema::create('printers', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Supply::class)->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
 

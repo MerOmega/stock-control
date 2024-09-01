@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\State;
+use Database\Factories\DeviceFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $sku
@@ -27,31 +29,32 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \App\Models\Sector|null $sector
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Supply> $supplies
  * @property-read int|null $supplies_count
- * @method static \Database\Factories\DeviceFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|Device newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Device newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Device query()
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereBrandId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereDeviceableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereDeviceableType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereEntryYear($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereSectorId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereSku($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereState($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Device whereUpdatedAt($value)
+ * @method static DeviceFactory factory($count = null, $state = [])
+ * @method static Builder|Device newModelQuery()
+ * @method static Builder|Device newQuery()
+ * @method static Builder|Device query()
+ * @method static Builder|Device whereBrandId($value)
+ * @method static Builder|Device whereCreatedAt($value)
+ * @method static Builder|Device whereDeviceableId($value)
+ * @method static Builder|Device whereDeviceableType($value)
+ * @method static Builder|Device whereEntryYear($value)
+ * @method static Builder|Device whereId($value)
+ * @method static Builder|Device whereSectorId($value)
+ * @method static Builder|Device whereSku($value)
+ * @method static Builder|Device whereState($value)
+ * @method static Builder|Device whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Device extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sku', 'entry_year', 'state', 'brand_id', 'sector_id'];
+    protected $fillable = ['sku', 'entry_year', 'state', 'brand_id', 'sector_id', 'deviceable_type', 'deviceable_id'];
 
     protected $casts = [
-        'state' => State::class,
-    ];
+            'state'      => State::class,
+            'entry_year' => 'datetime',
+        ];
 
     public function deviceable(): MorphTo
     {

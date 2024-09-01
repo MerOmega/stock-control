@@ -28,13 +28,14 @@
     @php
         $links = [
             ['url' => '/', 'text' => 'Inicio', 'active' => request()->routeIs('dashboard')],
-            ['url' => '/categories', 'text' => 'Categorias', 'active' => request()->routeIs('category.index')],
-            ['url' => '/supplies', 'text' => 'Insumos', 'active' => request()->routeIs('projects')],
-            ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('calendar')],
+            ['url' => '/categories', 'text' => 'Categorias', 'active' => request()->routeIs('categories.index')],
+            ['url' => '/sectors', 'text' => 'Sectores', 'active' => request()->routeIs('sectors.index')],
+            ['url' => '/supplies', 'text' => 'Insumos', 'active' => request()->routeIs('supplies.index')],
+            ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('devices.index')],
         ];
     @endphp
 
-    <x-navbar :links="$links" />
+    <x-navbar :links="$links"/>
 
     <header class="bg-white dark:bg-gray-800 shadow">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -50,7 +51,8 @@
 
 <!-- Theme Toggle Button for Testing -->
 <div class="fixed bottom-4 right-4">
-    <button onclick="toggleTheme()" class="bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800 px-4 py-2 rounded-md">
+    <button onclick="toggleTheme()"
+            class="bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800 px-4 py-2 rounded-md">
         Toggle Theme
     </button>
 </div>

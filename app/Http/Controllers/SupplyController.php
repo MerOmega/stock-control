@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Configuration;
 use App\Models\Supply;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
 class SupplyController extends Controller
@@ -72,9 +75,8 @@ class SupplyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Supply $supply)
+    public function edit(Supply $supply): Application|Factory|View
     {
-
         $categories = Category::all();
         return view('supply.edit', ['supply' => $supply, 'categories' => $categories]);
     }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Supply::class)->nullable()->constrained()->nullOnDelete();
             $table->foreignIdFor(Device::class)->nullable()->constrained()->nullOnDelete();
-            $table->integer('quantity');
+            $table->integer('quantity')->default(1);
             $table->timestamps();
         });
     }
