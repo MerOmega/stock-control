@@ -75,6 +75,7 @@ class Device extends Model
     public function supplies(): BelongsToMany
     {
         return $this->belongsToMany(Supply::class, 'device_supply')
-            ->withPivot('quantity');
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 }

@@ -8,10 +8,26 @@ use App\Models\Supply;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SupplyController extends Controller
 {
+
+    public function search(Request $request): JsonResponse
+    {
+        $search   = $request->input('q');
+        $supplies = Supply::where('name', 'like', '%' . $search . '%')
+            ->where('quantity', '>', 0)->get();
+        return response()->json($supplies);
+    }
+
+    public function getSupply(int $id): JsonResponse
+    {
+        $supply = Supply::find($id);
+        return response()->json($supply);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -30,8 +46,8 @@ class SupplyController extends Controller
         $categories = Category::all();
         $supplies = $query->orderBy('name')->paginate(Configuration::first()->default_per_page);
         return view('supply.index', [
-            'supplies' => $supplies,
-            'categories' => $categories,
+            'supplies'         => $supplies,
+            'categories'       => $categories,
             'selectedCategory' => $categoryId,
         ]);
     }

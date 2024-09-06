@@ -35,6 +35,9 @@
                     <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                         {{ $supply->name }}
                     </h3>
+                    <p class="pt-6">
+                        <span>Quantity: {{ $supply->quantity }}</span>
+                    </p>
                 </a>
                 <div class="p-4 flex justify-between">
                     <a href="{{ route('supplies.edit', $supply->id) }}"
