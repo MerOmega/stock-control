@@ -1,4 +1,4 @@
-<x-layout title="Crear Suministro">
+<x-layout title="Crear Insumo">
     <x-submit-error/>
     <form method="POST" action="{{ route('supplies.store') }}">
         @csrf

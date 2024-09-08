@@ -32,6 +32,7 @@
             ['url' => '/sectors', 'text' => 'Sectores', 'active' => request()->routeIs('sectors.index')],
             ['url' => '/supplies', 'text' => 'Insumos', 'active' => request()->routeIs('supplies.index')],
             ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('devices.index')],
+            ['url' => '/configurations/edit', 'text' => 'Configuracion', 'active' => request()->routeIs('configurations.edit')],
         ];
     @endphp
 
@@ -44,6 +45,11 @@
     </header>
     <main>
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 p-4 mb-4 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
             {{ $slot }}
         </div>
     </main>

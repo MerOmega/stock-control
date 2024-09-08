@@ -4,7 +4,8 @@
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar insumo..."
                    class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2">
 
-            <select name="category_id" class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2">
+            <select name="category_id"
+                    class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2">
                 <option value="">Todas las Categorías</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}" {{ $category->id == $selectedCategory ? 'selected' : '' }}>
@@ -30,12 +31,22 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         @forelse($supplies as $supply)
-            <div class="flex flex-col justify-between h-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div
+                class="flex flex-col justify-between h-full bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
                 <a href="{{ route('supplies.show', $supply->id) }}" class="block p-6 flex-grow">
                     <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                         {{ $supply->name }}
                     </h3>
-                    <p class="pt-6">
+                    <p class="pt-6 flex flex-col">
+                        @if($supply->quantity == 0)
+                            <span class="text-red-600 dark:text-red-400">
+                                 <i class="fas fa-exclamation-triangle"></i> Sin Stock
+                            </span>
+                        @elseif($supply->quantity <= $lowStock)
+                            <span class="text-yellow-500 dark:text-yellow-400">
+                             <i class="fas fa-exclamation-circle"></i> Stock Bajo
+                         </span>
+                        @endif
                         <span>Quantity: {{ $supply->quantity }}</span>
                     </p>
                 </a>
@@ -43,6 +54,11 @@
                     <a href="{{ route('supplies.edit', $supply->id) }}"
                        class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600">
                         <i class="fas fa-edit"></i>
+                    </a>
+
+                    <a href="{{ route('supplies.records', $supply) }}"
+                       class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600">
+                        <i class="fas fa-receipt"></i>
                     </a>
 
                     <button

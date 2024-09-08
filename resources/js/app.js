@@ -104,7 +104,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    alert('insumonistro eliminado con éxito');
+                    alert('Insumo eliminado con éxito');
                     window.location.reload();
                 } else {
                     alert('Error al eliminar el insumo.');
@@ -116,44 +116,51 @@ $(document).ready(function() {
         });
     });
 
-    $('.update-supply').on('click', function() {
+    $('.update-supply').on('click', async function() {
         const deviceId = $(this).data('device-id');
         const supplyId = $(this).data('supply-id');
         const quantityInput = $(`#quantity-${supplyId}`);
         let currentQuantity = parseInt(quantityInput.val(), 10);
 
-        $.ajax({
-            url: `/supplies/supply/${supplyId}`,
-            method: 'GET',
-            success: function(response) {
-                let limitQuantity = response.quantity;
-                if (currentQuantity - limitQuantity < 0) {
-                    alert(`La cantidad excede el insumonistro disponible. Máximo disponible: ${limitQuantity}`);
-                    return;
-                }
+        try {
+            const currentSupplyResponse = await $.ajax({
+                url: `/devices/${deviceId}/supplies/${supplyId}`,
+                method: 'GET',
+            });
 
-                $.ajax({
-                    url: `/devices/${deviceId}/supplies/${supplyId}`,
-                    method: 'PUT',
-                    data: {
-                        quantity: currentQuantity,
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            quantityInput.val(currentQuantity);
-                        } else {
-                            alert('Error al actualizar la cantidad.');
-                        }
-                    },
-                    error: function() {
-                        alert('Error al procesar la solicitud.');
-                    }
-                });
-            },
-            error: function() {
-                alert('Error al procesar la solicitud para obtener la cantidad disponible.');
+            let currentSupplyQuantity = currentSupplyResponse.quantity;
+
+            const availableSupplyResponse = await $.ajax({
+                url: `/supplies/supply/${supplyId}`,
+                method: 'GET',
+            });
+
+            let availableQuantity = availableSupplyResponse.quantity;
+            let totalQuantityToAdd = currentQuantity - currentSupplyQuantity;
+
+            if (availableQuantity - totalQuantityToAdd < 0) {
+                alert(`La cantidad excede el insumo disponible. Máximo disponible: ${availableQuantity}`);
+                return;
             }
-        });
+
+            const updateResponse = await $.ajax({
+                url: `/devices/${deviceId}/supplies/${supplyId}`,
+                method: 'PUT',
+                data: {
+                    quantity: currentQuantity,
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                },
+            });
+
+            if (updateResponse.success) {
+                quantityInput.val(currentQuantity);
+                window.location.reload();
+            } else {
+                alert('Error al actualizar la cantidad.');
+            }
+        } catch (error) {
+            alert('Error al procesar la solicitud.');
+            console.error(error);
+        }
     });
 });

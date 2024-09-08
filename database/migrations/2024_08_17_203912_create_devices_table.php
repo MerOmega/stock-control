@@ -1,9 +1,7 @@
 <?php
 
 use App\Models\Brand;
-use App\Models\Device;
 use App\Models\Sector;
-use App\Models\Supply;
 use App\State;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->string('sku');
+            $table->string('sku')->unique();
             $table->dateTime('entry_year');
             $table->enum('state', array_column(State::cases(), 'value'));
             $table->foreignIdFor(Sector::class)->nullable()->constrained()->nullOnDelete();

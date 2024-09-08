@@ -42,13 +42,14 @@
                         <select name="state" id="state" required
                                 class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6">
                             @foreach(App\State::cases() as $state)
-                                <option value="{{ $state->value }}" {{ old('state', $device->state) == $state->value ? 'selected' : '' }}>
+                                <option value="{{ $state->value }}" {{ old('state', $device->state->value ?? App\State::InUse->value) == $state->value ? 'selected' : '' }}>
                                     {{ $state->label() }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
                 </div>
+
 
                 <div class="col-span-full">
                     <label for="entry_year" class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">

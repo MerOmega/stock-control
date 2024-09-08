@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * 
+ *
  *
  * @property int $id
+ * @property string $name
  * @property int|null $category_id
  * @property int $quantity
  * @property string $description
@@ -37,7 +39,7 @@ class Supply extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'price', 'quantity', 'category_id'];
+    protected $fillable = ['name', 'price', 'quantity', 'category_id', 'description', 'observations'];
 
     public function category(): BelongsTo
     {
@@ -48,5 +50,10 @@ class Supply extends Model
     {
         return $this->belongsToMany(Device::class, 'device_supply')
             ->withPivot('quantity');
+    }
+
+    public function record(): HasOne
+    {
+        return $this->hasOne(SupplyRecord::class);
     }
 }

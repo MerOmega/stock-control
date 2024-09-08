@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $low_stock_alert
@@ -26,4 +26,16 @@ use Illuminate\Database\Eloquent\Model;
 class Configuration extends Model
 {
     use HasFactory;
+
+    protected $table    = 'configurations';
+    protected $fillable = ['low_stock_alert', 'default_per_page'];
+
+    public static function getSingleton()
+    {
+        // Use first() to ensure there's only one record and create if not exists
+        return self::firstOrCreate([], [
+            'low_stock_alert' => 10,
+            'default_per_page' => 10,
+        ]);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Configuration;
 use App\Models\Sector;
 use Illuminate\Http\Request;
+use function Symfony\Component\Translation\t;
 
 class SectorController extends Controller
 {
@@ -44,7 +45,7 @@ class SectorController extends Controller
         Sector::create([
            'name' => $request['name']
         ]);
-        return redirect()->route('sectors.index')->with('success', 'Sector created successfully.');
+        return redirect()->route('sectors.index')->with('success', trans('messages.sector.sector_created'));
     }
 
     /**
@@ -76,7 +77,7 @@ class SectorController extends Controller
         $sector->update([
             'name' => $request['name']
         ]);
-        return redirect()->route('sectors.index')->with('success', 'Sector updated successfully.');
+        return redirect()->route('sectors.index')->with('success', trans('messages.sector.sector_updated'));
     }
 
     /**
@@ -85,6 +86,6 @@ class SectorController extends Controller
     public function destroy(Sector $sector)
     {
         $sector->delete();
-        return redirect()->route('sectors.index')->with('success', 'Sector deleted successfully.');
+        return redirect()->route('sectors.index')->with('success', trans('messages.sector.sector_deleted'));
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Configuration;
 use App\Models\Supply;
+use App\Services\RecordService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
@@ -13,6 +14,19 @@ use Illuminate\Http\Request;
 
 class SupplyController extends Controller
 {
+
+    public function __construct(readonly RecordService $recordService)
+    {
+    }
+
+    public function getSupplyRecord(Request $request, Supply $supply): View
+    {
+        $records = $supply->record()->orderBy('created_at', 'desc')->paginate(Configuration::first()->default_per_page);
+        return view('supply.record', [
+            'supply'  => $supply,
+            'records' => $records,
+        ]);
+    }
 
     public function search(Request $request): JsonResponse
     {
@@ -49,6 +63,7 @@ class SupplyController extends Controller
             'supplies'         => $supplies,
             'categories'       => $categories,
             'selectedCategory' => $categoryId,
+            'lowStock'        =>  Configuration::first()->low_stock_alert
         ]);
     }
 
@@ -74,8 +89,11 @@ class SupplyController extends Controller
             'observations' => 'nullable|string',
         ]);
 
-        Supply::create($request->all());
-        return redirect()->route('supplies.index')->with('success', 'Supply created successfully!');
+        $supply = Supply::create($request->all());
+
+        $this->recordService->createRecord($supply, 'Insumo creado');
+
+        return redirect()->route('supplies.index')->with('success', 'Insumo creado!');
     }
 
 
@@ -111,10 +129,12 @@ class SupplyController extends Controller
             'observations' => 'nullable|string',
         ]);
 
+        $original = $supply->getOriginal();
         $supply->update($validated);
-
+        $changes  = $supply->getChanges();
+        $this->recordService->createRecord($supply, 'Insumo editado ', $changes, $original);
         return redirect()->route('supplies.show', $supply->id)
-            ->with('success', 'Supply updated successfully!');
+            ->with('success', 'Insumo actualizado!');
     }
 
     /**
@@ -122,8 +142,12 @@ class SupplyController extends Controller
      */
     public function destroy(Supply $supply)
     {
+        foreach ($supply->devices as $device) {
+            $device->supplies()->detach($supply->id);
+            $this->recordService->createRecord($device, 'Insumo eliminado '. $supply->name .'. Se retiro dicho insumo del dispositivo');
+        }
         $supply->delete();
         return redirect()->route('supplies.index')
-            ->with('success', 'Supply deleted successfully!');
+            ->with('success', trans('messages.supply.supply_deleted'));
     }
 }
