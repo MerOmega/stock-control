@@ -21,7 +21,7 @@ Route::resource('supplies', SupplyController::class);
 Route::resource('sectors', SectorController::class);
 
 Route::get('/devices/select-type', [DeviceController::class, 'selectType'])->name('devices.selectType');
-Route::get('/devices/create/{type}', [DeviceController::class, 'create'])->name('devices.create');
+Route::get('/devices/create/{type}', [DeviceController::class, 'create'])->name('devices.create.type');
 Route::get('/devices/{device}/supplies/{supply}', [DeviceController::class, 'getSupplyDevice'])->name('devices.supply_device');
 Route::get('/devices/{device}/record', [DeviceController::class, 'getDeviceRecord'])->name('devices.records');
 route::post('/devices/store-supplies', [DeviceController::class, 'storeSupplies'])->name('devices.store_supplies');

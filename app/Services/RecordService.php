@@ -22,16 +22,15 @@ class RecordService
     private function formatChanges(?array $changes, ?array $original): array
     {
         $formatted = [];
+        unset($changes['updated_at']);
         if ($changes && $original) {
             foreach ($changes as $key => $newValue) {
-                if ($key !== 'updated_at') {
-                    $oldValue = $original[$key] ?? null;
-                    $formatted[] = [
-                        'key'      => $key,
-                        'oldValue' => $oldValue,
-                        'newValue' => $newValue,
-                    ];
-                }
+                $oldValue    = $original[$key] ?? null;
+                $formatted[] = [
+                    'key'      => $key,
+                    'oldValue' => $oldValue,
+                    'newValue' => $newValue,
+                ];
             }
         }
         return $formatted;

@@ -57,13 +57,25 @@ class SupplyController extends Controller
             $query->where('name', 'like', '%' . $search . '%');
         }
 
+        if ($lowStock = $request->input('low_stock')) {
+            $query->where('quantity', '<=', Configuration::first()->low_stock_alert);
+        }
+
+        if ($noStock = $request->input('no_stock')) {
+            $query->where('quantity', '=', 0);
+        }
+
         $categories = Category::all();
         $supplies = $query->orderBy('name')->paginate(Configuration::first()->default_per_page);
+
         return view('supply.index', [
             'supplies'         => $supplies,
             'categories'       => $categories,
             'selectedCategory' => $categoryId,
-            'lowStock'        =>  Configuration::first()->low_stock_alert
+            'search'           => $search,
+            'noStockSearch'    => $noStock,
+            'lowStockSearch'   => $lowStock, // corrected typo
+            'lowStock'         => Configuration::first()->low_stock_alert,
         ]);
     }
 
@@ -124,7 +136,7 @@ class SupplyController extends Controller
         $validated = $request->validate([
             'name'         => 'required|string|max:255',
             'category_id'  => 'nullable|exists:categories,id',
-            'quantity'     => 'required|integer|min:1',
+            'quantity'     => 'required|integer|min:0',
             'description'  => 'nullable|string',
             'observations' => 'nullable|string',
         ]);

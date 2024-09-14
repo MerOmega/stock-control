@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -32,5 +32,10 @@ class PC extends Model
     public function device(): MorphOne
     {
         return $this->morphOne(Device::class, 'deviceable');
+    }
+
+    public function getLabel(): string
+    {
+        return trans('messages.device.type.PC');
     }
 }

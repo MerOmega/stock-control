@@ -6,7 +6,7 @@
         <div class="space-y-12">
             <div class="border-b border-gray-900/10 pb-12">
                 <div class="col-span-full">
-                    <label for="name" class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+                    <label for="name" class="block pl-1 text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
                         Nombre
                     </label>
                     <div class="mt-2">

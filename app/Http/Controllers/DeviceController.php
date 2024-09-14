@@ -9,6 +9,7 @@ use App\Models\PC;
 use App\Models\Printer;
 use App\Models\Sector;
 use App\Models\Supply;
+use App\Services\DeviceService;
 use App\Services\RecordService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -23,10 +24,13 @@ class DeviceController extends Controller
         = [
             'pc'      => 'PC',
             'monitor' => 'Monitor',
-            'printer' => 'Printer',
+            'printer' => 'Impresora',
         ];
 
-    public function __construct(readonly RecordService $recordService)
+    public function __construct(
+        readonly RecordService $recordService,
+        readonly DeviceService $deviceService
+    )
     {
     }
 
@@ -73,7 +77,7 @@ class DeviceController extends Controller
             $existingSupply->save();
 
             $this->recordService->createRecord($device, 'Insumo agregado '.$existingSupply->name.' cantidad: '. $supply['quantity']);
-            $this->recordService->createRecord($existingSupply, 'Insumo agregado '. $device->sku . ' cantidad:'. $supply['quantity']);
+            $this->recordService->createRecord($existingSupply, 'Insumo agregado '. $device->sku . ' cantidad: '. $supply['quantity']);
         }
 
         return response()->json(['success' => true]);
@@ -83,17 +87,26 @@ class DeviceController extends Controller
     public function removeSupply(Device $device, Supply $supply): JsonResponse
     {
         $existingSupply = $device->supplies()->where('supply_id', $supply->id)->first();
+        $supplyQuantity = $supply->quantity;
 
-        if ($existingSupply) {
-            $supply->increment('quantity', $existingSupply->pivot->quantity);
-            $device->supplies()->detach($supply->id);
-            return response()->json(['success' => true]);
+        if (!$existingSupply) {
+            return response()->json(['success' => false, 'message' => trans('message.device.supply_not_found')], 404);
         }
 
-        $this->recordService->createRecord($supply, 'Insumo devuelto desde'. $device->sku .'cantidad devuelta: '. $existingSupply->pivot->quantity);
+        $original = ['quantity' => $supplyQuantity];
+        $changes  = ['quantity' => $supplyQuantity +
+            $supply->increment('quantity', $existingSupply->pivot->quantity)
+        ];
+
+        $device->supplies()->detach($supply->id);
+
+        $this->recordService->createRecord(
+            $supply, 'Insumo eliminado de ' . $device->sku . ' cantidad devuelta: ' . $existingSupply->pivot->quantity,
+            $changes, $original);
+
         $this->recordService->createRecord($device, 'Insumo devuelto: '. $supply->name . ' cantidad devuelta: '. $existingSupply->pivot->quantity);
 
-        return response()->json(['success' => false, 'message' => trans('message.device.supply_not_found')], 404);
+        return response()->json(['success' => true]);
     }
 
     public function updateSupply(Request $request, Device $device, Supply $supply): JsonResponse
@@ -101,34 +114,9 @@ class DeviceController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:0',
         ]);
-
         $quantity       = (int)$request->input('quantity');
-        $existingSupply = $device->supplies()->where('supply_id', $supply->id)->first();
 
-        if ($existingSupply) {
-            $currentDeviceQuantity = $existingSupply->pivot->quantity;
-            $difference            = $quantity - $currentDeviceQuantity;
-
-            if ($difference > 0) {
-                if ($supply->quantity >= $difference) {
-                    $device->supplies()->updateExistingPivot($supply->id, ['quantity' => $quantity]);
-                    $supply->decrement('quantity', $difference);
-                    $this->recordService->createRecord($supply, 'Insumo retirado hacia '.$device->sku.', cantidad retirada: '. $difference);
-                    $this->recordService->createRecord($device, 'Insumo agregado: '. $supply->name . ' cantidad retirada: '. $difference);
-                } else {
-                    return response()->json(['error' => false, 'message' => 'No hay suficientes insumos en el inventario.'], 400);
-                }
-            } elseif ($difference < 0) {
-                $device->supplies()->updateExistingPivot($supply->id, ['quantity' => $quantity]);
-                $supply->increment('quantity', abs($difference));
-                $this->recordService->createRecord($supply, 'Insumo devuelto: '. $supply->name . ' cantidad devuelta:'. abs($difference));
-                $this->recordService->createRecord($device, 'Insumo devuelto: '. $supply->name . ' cantidad devuelta:'. abs($difference));
-            }
-
-            return response()->json(['success' => true]);
-        }
-
-        return response()->json(['error' => false, 'message' => 'Insumo no encontrado en este dispositivo.'], 404);
+        return $this->deviceService->updateSupply($device, $supply, $quantity);
     }
 
     public function getSupplyDevice(Request $request, Device $device, Supply $supply): JsonResponse
@@ -152,16 +140,26 @@ class DeviceController extends Controller
      */
     public function index(Request $request): Application|Factory|View
     {
-        $query = Device::query();
+        $sectorId = $request->input('sector_id');
+        $state    = $request->input('state');
+        $search   = $request->input('search');
+        $type     = $request->input('type');
 
-        if ($search = $request->input('search')) {
-            $query->where('sku', 'like', '%' . $search . '%');
-        }
-
-        $devices = $query->orderBy('sku')->paginate(Configuration::first()->default_per_page);
+        $devices = Device::query()
+            ->when($sectorId, fn($query) => $query->where('sector_id', $sectorId))
+            ->when($state, fn($query) => $query->where('state', $state))
+            ->when($search, fn($query) => $query->where('sku', 'like', '%' . $search . '%'))
+            ->when($type, fn($query) => $query->where('deviceable_type', 'App\Models\\' . $type))
+            ->orderBy('sku')
+            ->paginate(Configuration::first()->default_per_page);
 
         return view('device.index', [
-            'devices' => $devices,
+            'devices'        => $devices,
+            'sectors'        => Sector::all(),
+            'selectedSector' => $sectorId,
+            'selectedState'  => $state ?? null,
+            'search'         => $search,
+            'selectedType'   => $type,
         ]);
     }
 
@@ -215,16 +213,25 @@ class DeviceController extends Controller
             $deviceable = $deviceable();
         }
 
-        $device = Device::create(array_merge($validatedDevice, [
-            'deviceable_type' => get_class($deviceable),
-            'deviceable_id'   => $deviceable->id,
-        ]));
+        try {
+            $device = Device::create(array_merge($validatedDevice, [
+                'deviceable_type' => get_class($deviceable),
+                'deviceable_id'   => $deviceable->id,
+            ]));
+        } catch (\Exception $e) {
+            $message = "Hubo un error al guardar";
 
+            if ($e->getCode() === '23000') { {
+                $message = 'Hubo un error al guardar, verifique que su SKU sea unico';
+            }
+
+            return redirect()->back()->withErrors($message)->withInput();
+        }
+}
         $this->recordService->createRecord($device, 'Dispositivo creado');
 
         return redirect()->route('devices.index')->with('success', 'Monitor created successfully!');
     }
-
 
     /**
      * Display the specified resource.
@@ -281,7 +288,19 @@ class DeviceController extends Controller
         }
 
         $original = $device->getOriginal();
-        $device->update($validatedDevice);
+
+        try {
+
+            $device->update($validatedDevice);
+        } catch (\Exception $e) {
+            $message = "Hubo un error al guardar";
+            if ($e->getCode() === '23000') {
+                {
+                    $message = 'El SKU debe ser unico';
+                }
+                return redirect()->back()->withErrors($message)->withInput();
+            }
+        }
         $changes  = $device->getChanges();
         $this->recordService->createRecord($device, 'Dispositivo modificado ', $changes, $original);
 

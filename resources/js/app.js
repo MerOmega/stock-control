@@ -7,6 +7,16 @@ $(document).ready(function() {
     const deviceId = deviceContainer.data('device-id');
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
+    window.toggleMobileMenu = function() {
+        const mobileMenu = $('#mobile-menu');
+        const menuOpenIcon = $('#menu-open-icon');
+        const menuCloseIcon = $('#menu-close-icon');
+        mobileMenu.toggleClass('hidden');
+
+        menuOpenIcon.toggleClass('hidden');
+        menuCloseIcon.toggleClass('hidden');
+    };
+
     $('#supply-search').on('input', function() {
         const query = $.trim($(this).val());
         if (query.length >= 2) {

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $has_vga
@@ -38,5 +38,10 @@ class Monitor extends Model
     public function device(): MorphOne
     {
         return $this->morphOne(Device::class, 'deviceable');
+    }
+
+    public function getLabel(): string
+    {
+        return trans('messages.device.type.Monitor');
     }
 }

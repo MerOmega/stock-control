@@ -2,7 +2,7 @@
 
     <div id="device-container" data-device-id="{{ $device->id }}" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
         <div class="flex justify-between pb-2">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $device->sku }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $device->deviceable->getLabel() }} - {{ $device->sku }}</h1>
             <button
                 onclick="openModal('delete-modal-{{ $device->id }}', '{{ route('devices.destroy', $device->id) }}')"
                 class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600">
@@ -49,8 +49,8 @@
                                         <i class="fas fa-external-link-alt text-xs ml-1"></i>
                                     </a>
                                 </td>
-                                <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-700 dark:text-gray-300">
-                                    <input type="number" id="quantity-{{ $supply->id }}" value="{{ $supply->pivot->quantity }}" class="w-16 text-center rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100">
+                                <td class="py-2 px-4 border-b  border-gray-300 dark:border-gray-600 text-center text-gray-700 dark:text-gray-300">
+                                    <input type="number" id="quantity-{{ $supply->id }}" value="{{ $supply->pivot->quantity }}" class="w-16 bg-gray-100 text-center rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100">
                                 </td>
                                 <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center">
                                     <button type="button" class="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 remove-supply" data-device-id="{{ $device->id }}" data-supply-id="{{ $supply->id }}">Eliminar</button>
@@ -70,8 +70,8 @@
 
             <div id="supply-fields" class="space-y-4">
                 <div class="flex items-center space-x-2">
-                    <input type="text" id="supply-search" placeholder="Buscar insumo..." class="block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100" autocomplete="off">
-                    <input type="number" id="supply-quantity" placeholder="Cantidad" class="block w-24 rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100">
+                    <input type="text" id="supply-search" placeholder="Buscar insumo..." class="block pl-1 w-full bg-gray-100 rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100" autocomplete="off">
+                    <input type="number" id="supply-quantity" placeholder="Cantidad" class="block pl-1 bg-gray-100 w-24 rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100">
                     <button type="button" id="add-supply" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Agregar</button>
                 </div>
                 <ul id="supplies-list" class="mt-2 bg-white border border-gray-300 dark:bg-gray-700 dark:border-gray-600 rounded-md"></ul>

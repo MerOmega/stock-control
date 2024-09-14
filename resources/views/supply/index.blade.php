@@ -1,11 +1,11 @@
 <x-layout title="Insumos">
-    <div class="flex justify-between items-center mb-4">
-        <form method="GET" action="{{ route('supplies.index') }}" class="flex items-center space-x-2">
+    <div class="flex flex-col lg:flex-row justify-between items-center mb-4 space-y-4 lg:space-y-0">
+        <form method="GET" action="{{ route('supplies.index') }}" class="w-full lg:w-auto flex flex-col lg:flex-row items-center space-y-4 lg:space-x-2 lg:space-y-0">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar insumo..."
-                   class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2">
+                   class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2 w-full lg:w-auto">
 
             <select name="category_id"
-                    class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2">
+                    class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2 w-full lg:w-auto">
                 <option value="">Todas las Categorías</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}" {{ $category->id == $selectedCategory ? 'selected' : '' }}>
@@ -14,20 +14,44 @@
                 @endforeach
             </select>
 
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                Buscar
-            </button>
-            <a href="{{ route('supplies.index') }}"
-               class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                Reiniciar
-            </a>
+            <div class="flex flex-col lg:flex-row lg:space-x-4 w-full lg:w-auto">
+                <div class="flex items-center">
+                    <input type="checkbox" name="low_stock" id="low_stock" value="1"
+                           class="form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
+                        {{ request('low_stock') || old('low_stock', $lowStockSearch) ? 'checked' : '' }}>
+                    <label for="low_stock" class="ml-2 text-gray-700 dark:text-gray-300 font-medium">Stock Bajo</label>
+                </div>
+
+                <div class="flex items-center mt-2 lg:mt-0">
+                    <input type="checkbox" name="no_stock" id="no_stock" value="1"
+                           class="form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
+                        {{ request('no_stock') || old('no_stock', $noStockSearch) ? 'checked' : '' }}>
+                    <label for="no_stock" class="ml-2 text-gray-700 dark:text-gray-300 font-medium">Sin Stock</label>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-2">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full lg:w-auto">
+                    Buscar
+                </button>
+                <a href="{{ route('supplies.index') }}"
+                   class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full lg:w-auto text-center">
+                    Reiniciar
+                </a>
+            </div>
         </form>
 
         <a href="{{ route('supplies.create') }}"
-           class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+           class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-full lg:w-auto text-center">
             <i class="fas fa-plus"></i> Nuevo Insumo
         </a>
     </div>
+
+    @if($supplies->total() > 0)
+        <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-4 rounded-md">
+            <span class="font-semibold">Insumos totales:</span> {{ $supplies->total() }}
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         @forelse($supplies as $supply)

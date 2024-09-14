@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $supply_id
@@ -34,5 +34,10 @@ class Printer extends Model
     public function device(): MorphOne
     {
         return $this->morphOne(Device::class, 'deviceable');
+    }
+
+    public function getLabel(): string
+    {
+        return trans('messages.device.type.Printer');
     }
 }
