@@ -41,12 +41,20 @@
                             <ul>
                                 @foreach($data->changes as $change)
                                     @php
+                                        if($change->key == "observations"){
+                                             $oldLabel = null;
+                                        }else {
                                             $oldLabel = $change->oldValue;
-                                            $newLabel = $change->newValue;
-                                    @endphp
+                                        }
+                                        $newLabel = $change->newValue;
+                                        @endphp
                                     <li>
                                         <strong>{{ $change->key }}:</strong>
-                                        {{ $oldLabel }} → {{ $newLabel }}
+                                        @if($oldLabel === null)
+                                            {{ $newLabel }}
+                                        @else
+                                            {{ $oldLabel }} → {{ $newLabel }}
+                                        @endif
                                     </li>
                                 @endforeach
                             </ul>

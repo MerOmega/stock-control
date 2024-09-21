@@ -1,6 +1,7 @@
 <x-layout title="Dispositivos">
     <div class="flex flex-col lg:flex-row justify-between items-center mb-4 space-y-4 lg:space-y-0 lg:space-x-4">
-        <form method="GET" action="{{ route('devices.index') }}" class="w-full lg:w-auto flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-2">
+        <form method="GET" action="{{ route('devices.index') }}"
+              class="w-full lg:w-auto flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-2">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar dispositivo..."
                    class="rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 px-4 py-2 w-full lg:w-auto">
 
@@ -35,7 +36,8 @@
             </select>
 
             <div class="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-2">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full lg:w-auto">
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full lg:w-auto">
                     Buscar
                 </button>
                 <a href="{{ route('devices.index') }}"
@@ -66,6 +68,9 @@
                     <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                         {{ $device->deviceable->getLabel() }} - {{ $device->sku }}
                     </h3>
+                    <span class="mt-2 block text-base font-normal text-gray-600 dark:text-gray-400">
+                        {{ Str::limit($device->description, 50) ?? 'Sin descripción' }}
+                    </span>
                 </a>
                 <div class="p-4 flex justify-between">
                     <a href="{{ route('devices.edit', $device) }}"

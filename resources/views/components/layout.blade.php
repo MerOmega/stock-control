@@ -28,11 +28,11 @@
     @php
         $links = [
             ['url' => '/', 'text' => 'Inicio', 'active' => request()->routeIs('dashboard')],
-            ['url' => '/categories', 'text' => 'Categorias', 'active' => request()->routeIs('categories.index')],
-            ['url' => '/sectors', 'text' => 'Sectores', 'active' => request()->routeIs('sectors.index')],
+            ['url' => '/categories', 'text' => __('messages.category.nav.title'), 'active' => request()->routeIs('categories.index')],
+            ['url' => '/sectors', 'text' => __('messages.sector.nav.title'), 'active' => request()->routeIs('sectors.index')],
             ['url' => '/supplies', 'text' => 'Insumos', 'active' => request()->routeIs('supplies.index')],
-            ['url' => '/devices', 'text' => 'Dispositivos', 'active' => request()->routeIs('devices.index')],
-            ['url' => '/configurations/edit', 'text' => 'Configuracion', 'active' => request()->routeIs('configurations.edit')],
+            ['url' => '/devices', 'text' =>  __('messages.device.nav.title'), 'active' => request()->routeIs('devices.index')],
+            ['url' => '/configurations/edit', 'text' => __('messages.configuration.nav.title'), 'active' => request()->routeIs('configurations.edit')],
         ];
     @endphp
 
@@ -59,7 +59,7 @@
 <div class="fixed bottom-4 right-4">
     <button onclick="toggleTheme()"
             class="bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800 px-4 py-2 rounded-md">
-        Toggle Theme
+        {{ __('messages.root.toggle_theme') }}
     </button>
 </div>
 </body>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Configuration;
 use App\Models\Device;
 use App\Models\Monitor;
+use App\Models\OtherDevice;
 use App\Models\PC;
 use App\Models\Printer;
 use App\Models\Sector;
@@ -22,9 +23,10 @@ class DeviceController extends Controller
 {
     public static array $deviceTypes
         = [
-            'pc'      => 'PC',
-            'monitor' => 'Monitor',
-            'printer' => 'Impresora',
+            'pc'          => 'PC',
+            'monitor'     => 'Monitor',
+            'printer'     => 'Impresora',
+            'OtherDevice' => 'Otro',
         ];
 
     public function __construct(
@@ -186,19 +188,22 @@ class DeviceController extends Controller
     {
         // Validate general device fields
         $validatedDevice = $request->validate([
-            'sku'        => 'required|string|max:255',
-            'entry_year' => 'required|date',
-            'state'      => 'required|string',
-            'brand_id'   => 'nullable|exists:brands,id',
-            'sector_id'  => 'nullable|exists:sectors,id',
+            'sku'          => 'required|string|max:255',
+            'entry_year'   => 'required|date',
+            'state'        => 'required|string',
+            'brand_id'     => 'nullable|exists:brands,id',
+            'sector_id'    => 'nullable|exists:sectors,id',
+            'description'  => 'nullable|string',
+            'observations' => 'nullable|string',
         ]);
 
         $type = $request->input('type');
 
         $deviceable = match ($type) {
-            'pc' => PC::create(),
-            'printer' => Printer::create(),
-            'monitor' => function () use ($request) {
+            'pc'            => PC::create(),
+            'printer'       => Printer::create(),
+            'OtherDevice'   => OtherDevice::create(),
+            'monitor'       => function () use ($request) {
                 $validatedMonitor = $request->validate([
                     'has_vga'  => 'nullable|boolean',
                     'has_dp'   => 'nullable|boolean',
@@ -267,11 +272,13 @@ class DeviceController extends Controller
     public function update(Request $request, Device $device): RedirectResponse
     {
         $validatedDevice = $request->validate([
-            'sku'        => 'required|string|max:255',
-            'entry_year' => 'required|date',
-            'state'      => 'required|string',
-            'brand_id'   => 'nullable|exists:brands,id',
-            'sector_id'  => 'nullable|exists:sectors,id',
+            'sku'          => 'required|string|max:255',
+            'entry_year'   => 'required|date',
+            'state'        => 'required|string',
+            'brand_id'     => 'nullable|exists:brands,id',
+            'sector_id'    => 'nullable|exists:sectors,id',
+            'description'  => 'nullable|string',
+            'observations' => 'nullable|string',
         ]);
 
         if ($device->deviceable_type === Monitor::class) {

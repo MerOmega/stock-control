@@ -1,5 +1,5 @@
 @php
-    use App\State; // Adjust namespace if needed
+    use App\Models\Sector;use App\State; // Adjust namespace if needed
 @endphp
 <x-layout title="Historial de Registros del Dispositivo">
     <div class="flex justify-between items-center mb-4">
@@ -43,19 +43,32 @@
                             <ul>
                                 @foreach($data->changes as $change)
                                     @php
-                                        // Check if the change is for the 'state' key
-                                        if ($change->key === 'state') {
-                                            // Map the old and new values to the enum's labels
-                                            $oldLabel = State::from($change->oldValue)->label();
-                                            $newLabel = State::from($change->newValue)->label();
-                                        } else {
-                                            $oldLabel = $change->oldValue;
-                                            $newLabel = $change->newValue;
-                                        }
+                                        [$oldLabel, $newLabel] = match ($change->key) {
+                                           'state' => [
+                                               State::from($change->oldValue)->label(),
+                                               State::from($change->newValue)->label()
+                                           ],
+                                           'sector_id' => [
+                                               Sector::find($change->oldValue)->name,
+                                               Sector::find($change->newValue)->name
+                                           ],
+                                           'observations' => [
+                                               null,
+                                               $change->newValue
+                                           ],
+                                           default => [
+                                               $change->oldValue,
+                                               $change->newValue
+                                           ],
+                                       };
                                     @endphp
                                     <li>
                                         <strong>{{ $change->key }}:</strong>
-                                        {{ $oldLabel }} → {{ $newLabel }}
+                                        @if($oldLabel === null)
+                                            {{ $newLabel }}
+                                        @else
+                                            {{ $oldLabel }} → {{ $newLabel }}
+                                        @endif
                                     </li>
                                 @endforeach
                             </ul>

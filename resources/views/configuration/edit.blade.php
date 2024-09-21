@@ -1,4 +1,4 @@
-<x-layout title="Edit Configuration">
+<x-layout title="{{ __('messages.configuration.update.title') }}">
 
     <form action="{{ route('configurations.update') }}" method="POST">
         @csrf
@@ -7,7 +7,7 @@
         <!-- Low Stock Alert Field -->
         <div class="mb-4">
             <label for="low_stock_alert" class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
-                Alerta de stock bajo
+                {{ __('messages.configuration.update.fields.low_stock_alert') }}
             </label>
             <input type="number" name="low_stock_alert" id="low_stock_alert" required
                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-500 dark:focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-100"
@@ -20,7 +20,7 @@
         <!-- Default Items Per Page Field -->
         <div class="mb-4">
             <label for="default_per_page" class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
-                Default Items Per Page
+                {{ __('messages.configuration.update.fields.default_items_per_page') }}
             </label>
             <input type="number" name="default_per_page" id="default_per_page" required
                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-500 dark:focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:text-gray-100"
@@ -32,7 +32,7 @@
 
         <!-- Submit Button -->
         <button type="submit" class="bg-blue-600 dark:bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600">
-            Save Configuration
+            {{ __('messages.configuration.update.submit') }}
         </button>
     </form>
 

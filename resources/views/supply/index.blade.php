@@ -61,6 +61,9 @@
                     <h3 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                         {{ $supply->name }}
                     </h3>
+                    <span class="mt-2 block text-base font-normal text-gray-600 dark:text-gray-400">
+                        {{ Str::limit($supply->description, 50) ?? 'Sin descripción' }}
+                    </span>
                     <p class="pt-6 flex flex-col">
                         @if($supply->quantity == 0)
                             <span class="text-red-600 dark:text-red-400">

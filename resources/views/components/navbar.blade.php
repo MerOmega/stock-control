@@ -18,7 +18,7 @@
 
             <!-- Theme Toggle Button -->
             <button onclick="toggleTheme()" class="hidden md:block ml-auto bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md">
-                Toggle Theme
+                {{ __('messages.root.toggle_theme') }}
             </button>
 
             <div class="-mr-2 flex md:hidden">
@@ -36,16 +36,4 @@
         </div>
     </div>
 
-    <div class="md:hidden hidden" id="mobile-menu">
-        <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            @foreach($links as $link)
-                <a href="{{ $link['url'] }}" class="block rounded-md px-3 py-2 text-base font-medium {{ $link['active'] ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                    {{ $link['text'] }}
-                </a>
-            @endforeach
-            <button onclick="toggleTheme()" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md mt-2">
-                Toggle Theme
-            </button>
-        </div>
-    </div>
 </nav>

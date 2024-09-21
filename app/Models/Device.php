@@ -50,7 +50,11 @@ class Device extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sku', 'entry_year', 'state', 'brand_id', 'sector_id', 'deviceable_type', 'deviceable_id'];
+    protected $fillable
+        = [
+            'sku', 'entry_year', 'state', 'brand_id', 'sector_id', 'deviceable_type', 'deviceable_id',
+            'description', 'observations'
+        ];
 
     protected $casts = [
             'state'      => State::class,
