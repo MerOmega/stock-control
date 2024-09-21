@@ -42,3 +42,37 @@
 .dark .custom-checkbox.checked:after {
     background-color: #fbbf24;
 }
+
+.badge-en-reparacion {
+    background-color: #fbbf24;
+    color: #1f2937;
+}
+
+.badge-en-uso {
+    background-color: lightskyblue;
+    color: #1f2937;
+}
+
+.badge-esperando-repuesto {
+    background-color: darkorange;
+    color: #1f2937;
+}
+
+.badge-a-dar-de-baja {
+    background-color: #ef4444;
+    color: #1f2937;
+}
+
+.badge-dado-de-baja {
+    background-color: #6b7280;
+}
+
+.badge-en-espera {
+    background-color: #22d94c;
+    color: #1f2937;
+}
+
+.device-title-header {
+    border-radius: 10px;
+    @apply p-1
+}

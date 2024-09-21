@@ -4,13 +4,8 @@
         <div class="flex justify-between pb-2">
 
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $supply->name }}</h1>
-            <button
-                onclick="openModal('delete-modal-{{ $supply->id }}', '{{ route('supplies.destroy', $supply->id) }}')"
-                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600">
-                <i class="fas fa-trash"></i>
-            </button>
         </div>
-        <div class="flex flex-col">
+        <div class="flex p-1 items-center justify-between">
             <a href="{{ route('supplies.edit', $supply->id) }}"
                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600">
                 <i class="fas fa-edit"></i>
@@ -22,6 +17,13 @@
                 <i class="fas fa-receipt"></i>
                 <span>Ver Historial</span>
             </a>
+
+            <button
+                onclick="openModal('delete-modal-{{ $supply->id }}', '{{ route('supplies.destroy', $supply->id) }}')"
+                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600">
+                <i class="fas fa-trash"></i>
+                Eliminar Insumo
+            </button>
         </div>
         <div class="mt-4">
             <p class="text-gray-700 dark:text-gray-300">

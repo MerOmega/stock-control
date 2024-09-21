@@ -5,29 +5,39 @@
          class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
 
         <!-- Header Section -->
-        <div class="flex justify-between pb-2">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                {{ $device->deviceable->getLabel() }} - {{ $device->sku }}
-            </h1>
-            <button
-                onclick="openModal('delete-modal-{{ $device->id }}', '{{ route('devices.destroy', $device->id) }}')"
-                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600">
-                <i class="fas fa-trash"></i>
-            </button>
+        <div class="device-title-header badge-{{str_replace('_', '-', $device->state->value)}} ">
+            <div class="flex justify-between pb-2">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {{ $device->deviceable->getLabel() }} - {{ $device->sku }}
+                </h1>
+
+            </div>
+            <div class="text-center font-semibold">
+                    <span>
+                        {{ $device->state->label() }}
+                    </span>
+            </div>
         </div>
 
         <!-- Action Links -->
-        <div class="flex flex-col">
+        <div class="flex pt-2 items-center justify-between">
             <a href="{{ route('devices.edit', $device->id) }}"
                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600">
                 <i class="fas fa-edit"></i>
                 <span>Editar Dispositivo</span>
             </a>
             <a href="{{ route('devices.records', $device->id) }}"
-               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600 pt-2">
+               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600">
                 <i class="fas fa-receipt"></i>
                 <span>Ver Historial</span>
             </a>
+
+            <button
+                onclick="openModal('delete-modal-{{ $device->id }}', '{{ route('devices.destroy', $device->id) }}')"
+                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600">
+                <i class="fas fa-trash"></i>
+                Eliminar dispositivo
+            </button>
         </div>
 
         <!-- Device Information -->
@@ -38,7 +48,7 @@
             <p class="text-gray-700 dark:text-gray-300">
                 <strong>Estado:</strong> {{ $device->state->label() ?? 'N/A' }}
             </p>
-            <p class="text-gray-700 dark:text-gray-300 mt-2">
+            <p class="text-gray-700 dark:text-gray-300">
                 <strong>Año de entrada:</strong> {{ $device->entry_year->format('d-m-Y') }}
             </p>
 
@@ -121,57 +131,63 @@
         <!-- Supplies by Category -->
         <div class="mt-6">
             <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">Insumos por Categoría</h2>
-            @foreach($suppliesByCategory as $categoryName => $supplies)
-                <div class="mt-4">
-                    <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200">{{ $categoryName }}</h3>
-                    <table class="min-w-full bg-white dark:bg-gray-800 rounded-md shadow-md">
-                        <thead>
-                        <tr>
-                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left text-gray-600 dark:text-gray-400">
-                                Insumos
-                            </th>
-                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-600 dark:text-gray-400">
-                                Cantidad
-                            </th>
-                            <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-600 dark:text-gray-400">
-                                Acciones
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($supplies as $supply)
+            @if (!$device->supplies->isEmpty())
+                @foreach($suppliesByCategory as $categoryName => $supplies)
+                    <div class="mt-4">
+                        <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200">{{ $categoryName }}</h3>
+                        <table class="min-w-full bg-white dark:bg-gray-800 rounded-md shadow-md">
+                            <thead>
                             <tr>
-                                <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
-                                    <a href="{{ route('supplies.show', $supply) }}" target="_blank"
-                                       class="text-blue-600 dark:text-blue-400 hover:underline">
-                                        {{ $supply->name }}
-                                        <i class="fas fa-external-link-alt text-xs ml-1"></i>
-                                    </a>
-                                </td>
-                                <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-700 dark:text-gray-300">
-                                    <input type="number" id="quantity-{{ $supply->id }}"
-                                           value="{{ $supply->pivot->quantity }}"
-                                           class="w-16 bg-gray-100 text-center rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100">
-                                </td>
-                                <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center">
-                                    <button type="button"
-                                            class="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 remove-supply"
-                                            data-device-id="{{ $device->id }}" data-supply-id="{{ $supply->id }}">
-                                        Eliminar
-                                    </button>
-                                    <button type="button"
-                                            class="bg-green-600 text-white px-2 py-1 rounded-md hover:bg-green-700 update-supply"
-                                            data-device-id="{{ $device->id }}" data-supply-id="{{ $supply->id }}"
-                                            data-action="change">
-                                        Modificar
-                                    </button>
-                                </td>
+                                <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-left text-gray-600 dark:text-gray-400">
+                                    Insumos
+                                </th>
+                                <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-600 dark:text-gray-400">
+                                    Cantidad
+                                </th>
+                                <th class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-600 dark:text-gray-400">
+                                    Acciones
+                                </th>
                             </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endforeach
+                            </thead>
+                            <tbody>
+                            @foreach($supplies as $supply)
+                                <tr>
+                                    <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
+                                        <a href="{{ route('supplies.show', $supply) }}" target="_blank"
+                                           class="text-blue-600 dark:text-blue-400 hover:underline">
+                                            {{ $supply->name }}
+                                            <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                                        </a>
+                                    </td>
+                                    <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center text-gray-700 dark:text-gray-300">
+                                        <input type="number" id="quantity-{{ $supply->id }}"
+                                               value="{{ $supply->pivot->quantity }}"
+                                               class="w-16 bg-gray-100 text-center rounded-md border-gray-300 dark:bg-gray-700 dark:text-gray-100">
+                                    </td>
+                                    <td class="py-2 px-4 border-b border-gray-300 dark:border-gray-600 text-center">
+                                        <button type="button"
+                                                class="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 remove-supply"
+                                                data-device-id="{{ $device->id }}" data-supply-id="{{ $supply->id }}">
+                                            Eliminar
+                                        </button>
+                                        <button type="button"
+                                                class="bg-green-600 text-white px-2 py-1 rounded-md hover:bg-green-700 update-supply"
+                                                data-device-id="{{ $device->id }}" data-supply-id="{{ $supply->id }}"
+                                                data-action="change">
+                                            Modificar
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endforeach
+            @else
+                <p class="text-gray-700 dark:text-gray-300 mt-2">
+                    Este dispositivo no tiene insumos asignados.
+                </p>
+            @endif
         </div>
 
         <!-- Add Supply Section -->

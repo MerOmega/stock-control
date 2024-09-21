@@ -72,6 +72,11 @@
                         {{ Str::limit($device->description, 50) ?? 'Sin descripción' }}
                     </span>
                 </a>
+                <div class="badge-{{str_replace('_', '-', $device->state->value)}} text-center font-semibold">
+                    <span>
+                        {{ strtoupper($device->state->label()) }}
+                    </span>
+                </div>
                 <div class="p-4 flex justify-between">
                     <a href="{{ route('devices.edit', $device) }}"
                        class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-600">
