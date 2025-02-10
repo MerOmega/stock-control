@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreDeviceRequest;
 use App\Models\Configuration;
 use App\Models\Device;
 use App\Models\Monitor;
@@ -78,8 +79,8 @@ class DeviceController extends Controller
             $existingSupply->quantity -= $supply['quantity'];
             $existingSupply->save();
 
-            $this->recordService->createRecord($device, 'Insumo agregado '.$existingSupply->name.' cantidad: '. $supply['quantity']);
-            $this->recordService->createRecord($existingSupply, 'Insumo agregado '. $device->sku . ' cantidad: '. $supply['quantity']);
+            $this->recordService->createRecord($device, 'Insumo agregado ' . $existingSupply->name . ' cantidad: ' . $supply['quantity']);
+            $this->recordService->createRecord($existingSupply, 'Insumo agregado ' . $device->sku . ' cantidad: ' . $supply['quantity']);
         }
 
         return response()->json(['success' => true]);
@@ -106,7 +107,7 @@ class DeviceController extends Controller
             $supply, 'Insumo eliminado de ' . $device->sku . ' cantidad devuelta: ' . $existingSupply->pivot->quantity,
             $changes, $original);
 
-        $this->recordService->createRecord($device, 'Insumo devuelto: '. $supply->name . ' cantidad devuelta: '. $existingSupply->pivot->quantity);
+        $this->recordService->createRecord($device, 'Insumo devuelto: ' . $supply->name . ' cantidad devuelta: ' . $existingSupply->pivot->quantity);
 
         return response()->json(['success' => true]);
     }
@@ -116,7 +117,7 @@ class DeviceController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:0',
         ]);
-        $quantity       = (int)$request->input('quantity');
+        $quantity = (int)$request->input('quantity');
 
         return $this->deviceService->updateSupply($device, $supply, $quantity);
     }
@@ -184,26 +185,21 @@ class DeviceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreDeviceRequest $request): RedirectResponse
     {
-        // Validate general device fields
-        $validatedDevice = $request->validate([
-            'sku'          => 'required|string|max:255',
-            'entry_year'   => 'required|date',
-            'state'        => 'required|string',
-            'brand_id'     => 'nullable|exists:brands,id',
-            'sector_id'    => 'nullable|exists:sectors,id',
-            'description'  => 'nullable|string',
-            'observations' => 'nullable|string',
-        ]);
+        $validatedDevice = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $validatedDevice['image'] = $request->file('image')->store('supplies', 'public');
+        }
 
         $type = $request->input('type');
 
         $deviceable = match ($type) {
-            'pc'            => PC::create(),
-            'printer'       => Printer::create(),
-            'OtherDevice'   => OtherDevice::create(),
-            'monitor'       => function () use ($request) {
+            'pc' => PC::create(),
+            'printer' => Printer::create(),
+            'OtherDevice' => OtherDevice::create(),
+            'monitor' => function () use ($request) {
                 $validatedMonitor = $request->validate([
                     'has_vga'  => 'nullable|boolean',
                     'has_dp'   => 'nullable|boolean',
@@ -226,13 +222,14 @@ class DeviceController extends Controller
         } catch (\Exception $e) {
             $message = "Hubo un error al guardar";
 
-            if ($e->getCode() === '23000') { {
-                $message = 'Hubo un error al guardar, verifique que su SKU sea unico';
-            }
+            if ($e->getCode() === '23000') {
+                {
+                    $message = 'Hubo un error al guardar, verifique que su SKU sea unico';
+                }
 
-            return redirect()->back()->withErrors($message)->withInput();
+                return redirect()->back()->withErrors($message)->withInput();
+            }
         }
-}
         $this->recordService->createRecord($device, 'Dispositivo creado');
 
         return redirect()->route('devices.index')->with('success', 'Monitor created successfully!');
@@ -269,17 +266,13 @@ class DeviceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Device $device): RedirectResponse
+    public function update(StoreDeviceRequest $request, Device $device): RedirectResponse
     {
-        $validatedDevice = $request->validate([
-            'sku'          => 'required|string|max:255',
-            'entry_year'   => 'required|date',
-            'state'        => 'required|string',
-            'brand_id'     => 'nullable|exists:brands,id',
-            'sector_id'    => 'nullable|exists:sectors,id',
-            'description'  => 'nullable|string',
-            'observations' => 'nullable|string',
-        ]);
+        $validatedDevice = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $validatedDevice['image'] = $request->file('image')->store('supplies', 'public');
+        }
 
         if ($device->deviceable_type === Monitor::class) {
             $validatedMonitor = $request->merge([
@@ -297,7 +290,6 @@ class DeviceController extends Controller
         $original = $device->getOriginal();
 
         try {
-
             $device->update($validatedDevice);
         } catch (\Exception $e) {
             $message = "Hubo un error al guardar";
@@ -308,7 +300,7 @@ class DeviceController extends Controller
                 return redirect()->back()->withErrors($message)->withInput();
             }
         }
-        $changes  = $device->getChanges();
+        $changes = $device->getChanges();
         $this->recordService->createRecord($device, 'Dispositivo modificado ', $changes, $original);
 
         return redirect()->route('devices.index')
@@ -326,7 +318,7 @@ class DeviceController extends Controller
         foreach ($supplies as $supply) {
             $device->supplies()->detach($supply->id);
             $supply->increment('quantity', $supply->pivot->quantity);
-            $this->recordService->createRecord($supply, 'Insumo devuelto desde dispositivo '. $device->sku.'.Ya que fue eliminado');
+            $this->recordService->createRecord($supply, 'Insumo devuelto desde dispositivo ' . $device->sku . '.Ya que fue eliminado');
         }
 
         $device->delete();

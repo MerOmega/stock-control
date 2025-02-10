@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ConfigRequest;
 use App\Models\Configuration;
-use Illuminate\Http\Request;
 
 class ConfigurationController extends Controller
 {
@@ -22,13 +22,8 @@ class ConfigurationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(ConfigRequest $request)
     {
-        $request->validate([
-            'low_stock_alert'  => 'required|integer|min:0',
-            'default_per_page' => 'required|integer|min:1',
-        ]);
-
         // Get the singleton configuration
         $configuration = Configuration::getSingleton();
 

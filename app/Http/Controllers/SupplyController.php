@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSupplyRequest;
+use App\Http\Requests\UpdateSupplyRequest;
 use App\Models\Category;
 use App\Models\Configuration;
 use App\Models\Supply;
@@ -10,16 +12,18 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class SupplyController extends Controller
 {
-
     public function __construct(readonly RecordService $recordService)
     {
     }
 
-    public function getSupplyRecord(Request $request, Supply $supply): View
+    public function getSupplyRecord(Supply $supply): View
     {
         $records = $supply->record()->orderBy('created_at', 'desc')->paginate(Configuration::first()->default_per_page);
         return view('supply.record', [
@@ -45,44 +49,32 @@ class SupplyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View|Factory|Application
     {
-        $query = Supply::query();
-
-        if ($categoryId = $request->input('category_id')) {
-            $query->where('category_id', $categoryId);
-        }
-
-        if ($search = $request->input('search')) {
-            $query->where('name', 'like', '%' . $search . '%');
-        }
-
-        if ($lowStock = $request->input('low_stock')) {
-            $query->where('quantity', '<=', Configuration::first()->low_stock_alert);
-        }
-
-        if ($noStock = $request->input('no_stock')) {
-            $query->where('quantity', '=', 0);
-        }
-
-        $categories = Category::all();
-        $supplies = $query->orderBy('name')->paginate(Configuration::first()->default_per_page);
+        $config = Configuration::first();
+        $supplies = Supply::query()
+            ->when($request->input('category_id'), fn($query, $categoryId) => $query->where('category_id', $categoryId))
+            ->when($request->input('search'), fn($query, $search) => $query->where('name', 'like', "%$search%"))
+            ->when($request->input('low_stock'), fn($query) => $query->where('quantity', '<=', $config->low_stock_alert))
+            ->when($request->input('no_stock'), fn($query) => $query->where('quantity', 0))
+            ->orderBy('name')
+            ->paginate($config->default_per_page);
 
         return view('supply.index', [
             'supplies'         => $supplies,
-            'categories'       => $categories,
-            'selectedCategory' => $categoryId,
-            'search'           => $search,
-            'noStockSearch'    => $noStock,
-            'lowStockSearch'   => $lowStock, // corrected typo
-            'lowStock'         => Configuration::first()->low_stock_alert,
+            'categories'       => Category::all(),
+            'selectedCategory' => $request->input('category_id'),
+            'search'           => $request->input('search'),
+            'noStockSearch'    => $request->input('no_stock'),
+            'lowStockSearch'   => $request->input('low_stock'),
+            'lowStock'         => $config->low_stock_alert,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View|Factory|Application
     {
         $categories = Category::all();
         return view('supply.create', compact('categories'));
@@ -91,18 +83,15 @@ class SupplyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSupplyRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name'         => 'required|string|max:255',
-            'category_id'  => 'nullable|exists:categories,id',
-            'quantity'     => 'required|integer|min:1',
-            'description'  => 'nullable|string',
-            'observations' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
-        $supply = Supply::create($request->all());
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('supplies', 'public');
+        }
 
+        $supply = Supply::create($data);
         $this->recordService->createRecord($supply, 'Insumo creado');
 
         return redirect()->route('supplies.index')->with('success', 'Insumo creado!');
@@ -112,9 +101,8 @@ class SupplyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Supply $supply)
+    public function show(Supply $supply): View|Factory|Application
     {
-        // Show the specific supply
         return view('supply.show', ['supply' => $supply]);
     }
 
@@ -130,19 +118,16 @@ class SupplyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Supply $supply)
+    public function update(UpdateSupplyRequest $request, Supply $supply): RedirectResponse
     {
-        // Validate the request data
-        $validated = $request->validate([
-            'name'         => 'required|string|max:255',
-            'category_id'  => 'nullable|exists:categories,id',
-            'quantity'     => 'required|integer|min:0',
-            'description'  => 'nullable|string',
-            'observations' => 'nullable|string',
-        ]);
-
         $original = $supply->getOriginal();
-        $supply->update($validated);
+        $data     = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('supplies', 'public');
+        }
+
+        $supply->update($data);
         $changes  = $supply->getChanges();
         $this->recordService->createRecord($supply, 'Insumo editado ', $changes, $original);
         return redirect()->route('supplies.show', $supply->id)
@@ -152,8 +137,12 @@ class SupplyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Supply $supply)
+    public function destroy(Supply $supply): RedirectResponse
     {
+        if ($supply->image) {
+            Storage::disk('public')->delete($supply->image);
+        }
+
         foreach ($supply->devices as $device) {
             $device->supplies()->detach($supply->id);
             $this->recordService->createRecord($device, 'Insumo eliminado '. $supply->name .'. Se retiro dicho insumo del dispositivo');

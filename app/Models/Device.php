@@ -53,7 +53,7 @@ class Device extends Model
     protected $fillable
         = [
             'sku', 'entry_year', 'state', 'brand_id', 'sector_id', 'deviceable_type', 'deviceable_id',
-            'description', 'observations'
+            'description', 'observations', 'image'
         ];
 
     protected $casts = [

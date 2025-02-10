@@ -42,15 +42,24 @@
 
         <!-- Device Information -->
         <div class="mt-4">
-            <p class="text-gray-700 dark:text-gray-300 mt-2">
-                <strong>Sector actual:</strong> {{ $device->sector->name ?? 'Sin sector asignado'}}
-            </p>
-            <p class="text-gray-700 dark:text-gray-300">
-                <strong>Estado:</strong> {{ $device->state->label() ?? 'N/A' }}
-            </p>
-            <p class="text-gray-700 dark:text-gray-300">
-                <strong>Año de entrada:</strong> {{ $device->entry_year->format('d-m-Y') }}
-            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-2">
+                {{-- Left Side: Image --}}
+                <div class="flex justify-center">
+                    @if($device->image)
+                        <img class="text-gray-700 dark:text-gray-300 mt-2 rounded-lg shadow-md"
+                             src="{{ asset('storage/' . $device->image) }}"
+                             alt="{{ $device->sku }}"
+                             width="150">
+                    @endif
+                </div>
+
+                {{-- Right Side: Device Details --}}
+                <div class="text-gray-700 dark:text-gray-300 space-y-2">
+                    <p><strong>Sector actual:</strong> {{ $device->sector->name ?? 'Sin sector asignado' }}</p>
+                    <p><strong>Estado:</strong> {{ $device->state->label() ?? 'N/A' }}</p>
+                    <p><strong>Año de entrada:</strong> {{ $device->entry_year->format('d-m-Y') }}</p>
+                </div>
+            </div>
 
             <!-- Description -->
             <div class="col-span-full mt-4">

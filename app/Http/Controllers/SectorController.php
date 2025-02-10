@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SectorRequest;
 use App\Models\Configuration;
 use App\Models\Sector;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use function Symfony\Component\Translation\t;
 
@@ -36,12 +38,8 @@ class SectorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(SectorRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
         Sector::create([
            'name' => $request['name']
         ]);
@@ -68,12 +66,8 @@ class SectorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Sector $sector)
+    public function update(SectorRequest $request, Sector $sector): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-
         $sector->update([
             'name' => $request['name']
         ]);

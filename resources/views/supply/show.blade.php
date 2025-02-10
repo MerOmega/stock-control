@@ -26,13 +26,29 @@
             </button>
         </div>
         <div class="mt-4">
-            <p class="text-gray-700 dark:text-gray-300">
-                <strong>Categoría:</strong> {{ $supply->category->name ?? 'N/A' }}</p>
-            <p class="text-gray-700 dark:text-gray-300 mt-2"><strong>Cantidad:</strong> {{ $supply->quantity }}</p>
-            <p class="text-gray-700 dark:text-gray-300 mt-2"><strong>Descripción:</strong> {{ $supply->description }}
-            </p>
-            <p class="text-gray-700 dark:text-gray-300 mt-2"><strong>Observaciones:</strong> {{ $supply->observations }}
-            </p>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div class="flex justify-center">
+                    @if($supply->image)
+                        <img class="text-gray-700 dark:text-gray-300 mt-2 rounded-lg shadow-md"
+                             src="{{ asset('storage/' . $supply->image) }}"
+                             alt="{{ $supply->name }}"
+                             width="150">
+                    @endif
+                </div>
+
+                {{-- Right Side: Device Details --}}
+                <div class="text-gray-700 dark:text-gray-300 space-y-2">
+                    <p class="text-gray-700 dark:text-gray-300">
+                        <strong>Categoría:</strong> {{ $supply->category->name ?? 'N/A' }}</p>
+                    <p class="text-gray-700 dark:text-gray-300 mt-2"><strong>Cantidad:</strong> {{ $supply->quantity }}</p>
+                    <p class="text-gray-700 dark:text-gray-300 mt-2"><strong>Descripción:</strong> {{ $supply->description }}
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 mt-2"><strong>Observaciones:</strong> {{ $supply->observations }}
+                    </p>
+                </div>
+            </div>
         </div>
 
 

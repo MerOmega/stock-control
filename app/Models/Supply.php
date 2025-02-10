@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 
 /**
  *
@@ -39,7 +40,7 @@ class Supply extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'price', 'quantity', 'category_id', 'description', 'observations'];
+    protected $fillable = ['name', 'price', 'quantity', 'category_id', 'description', 'observations', 'image'];
 
     public function category(): BelongsTo
     {
