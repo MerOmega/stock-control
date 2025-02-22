@@ -52,6 +52,10 @@
                                                Sector::find($change->oldValue)->name,
                                                Sector::find($change->newValue)->name
                                            ],
+                                           "image" => [
+                                               null,
+                                               "Imagen modificada"
+                                           ],
                                            'observations' => [
                                                null,
                                                $change->newValue

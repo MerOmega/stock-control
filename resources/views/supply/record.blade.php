@@ -41,13 +41,21 @@
                             <ul>
                                 @foreach($data->changes as $change)
                                     @php
-                                        if($change->key == "observations"){
-                                             $oldLabel = null;
-                                        }else {
-                                            $oldLabel = $change->oldValue;
-                                        }
-                                        $newLabel = $change->newValue;
-                                        @endphp
+                                        [$oldLabel, $newLabel] = match ($change->key) {
+                                           'observations' => [
+                                               null,
+                                               $change->newValue
+                                           ],
+                                           "image" => [
+                                               null,
+                                               "Imagen modificada"
+                                           ],
+                                           default => [
+                                               $change->oldValue,
+                                               $change->newValue
+                                           ],
+                                       };
+                                    @endphp
                                     <li>
                                         <strong>{{ $change->key }}:</strong>
                                         @if($oldLabel === null)

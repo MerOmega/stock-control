@@ -2,9 +2,6 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company">
-                </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         @foreach($links as $link)
@@ -12,6 +9,13 @@
                                 {{ $link['text'] }}
                             </a>
                         @endforeach
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300">
+                                    Log out!
+                                </button>
+                            </form>
                     </div>
                 </div>
             </div>
@@ -42,6 +46,13 @@
                     {{ $link['text'] }}
                 </a>
             @endforeach
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit"
+                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 mt-2 mb-4">
+                        Log out!
+                    </button>
+                </form>
             <button onclick="toggleTheme()" class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md mt-2">
                 Toggle Theme
             </button>
